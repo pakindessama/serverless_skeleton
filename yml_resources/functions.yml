@@ -1,0 +1,16 @@
+apiGetHttp:
+  handler: src/api-get.main
+  timeout: 28
+  events:
+    - httpApi:
+        path: /api/{proxy+}
+        method: GET
+
+
+apiPostHttp:
+  handler: src/api-post.main
+  timeout: 28
+  events:
+    - httpApi:
+        path: /api/{proxy+}
+        method: POST

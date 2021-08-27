@@ -1,0 +1,79 @@
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+Resources:
+  TableData:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.dataTableName}
+      AttributeDefinitions:
+        - AttributeName: ppk
+          AttributeType: S
+        - AttributeName: psk
+          AttributeType: S
+        - AttributeName: pk2
+          AttributeType: S
+        - AttributeName: sk2
+          AttributeType: S
+        - AttributeName: pk3
+          AttributeType: S
+        - AttributeName: sk3
+          AttributeType: S
+        - AttributeName: pk4
+          AttributeType: S
+        - AttributeName: sk4
+          AttributeType: S
+        - AttributeName: pk5
+          AttributeType: S
+        - AttributeName: sk5
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: ppk
+          KeyType: HASH
+        - AttributeName: psk
+          KeyType: RANGE
+      GlobalSecondaryIndexes: 
+        - IndexName: GSI1
+          KeySchema: 
+            - AttributeName: psk
+              KeyType: HASH
+            - AttributeName: ppk
+              KeyType: RANGE
+          Projection: 
+            ProjectionType: KEYS_ONLY
+        - IndexName: GSI2
+          KeySchema: 
+            - AttributeName: pk2
+              KeyType: HASH
+            - AttributeName: sk2
+              KeyType: RANGE
+          Projection: 
+            ProjectionType: ALL
+        - IndexName: GSI3
+          KeySchema: 
+            - AttributeName: pk3
+              KeyType: HASH
+            - AttributeName: sk3
+              KeyType: RANGE
+          Projection: 
+            ProjectionType: ALL
+        - IndexName: GSI4
+          KeySchema: 
+            - AttributeName: pk4
+              KeyType: HASH
+            - AttributeName: sk4
+              KeyType: RANGE
+          Projection: 
+            ProjectionType: ALL
+        - IndexName: GSI5
+          KeySchema: 
+            - AttributeName: pk5
+              KeyType: HASH
+            - AttributeName: sk5
+              KeyType: RANGE
+          Projection: 
+            ProjectionType: ALL
+
+Outputs:
+  TableData:
+    Value: !GetAtt TableData.Arn
+          

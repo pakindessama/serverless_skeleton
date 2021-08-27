@@ -1,0 +1,24 @@
+{
+  "scripts": {
+    "babelNode": "babel-node --presets @babel/preset-env",
+    "offline": "serverless offline start --stage offline & DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
+    "deploydev": "serverless deploy -v -c serverless.yml --aws-profile default --stage dev",
+    "deployuat": "serverless deploy -v -c serverless.yml --aws-profile default --stage uat"
+  },
+  "main": "handler.js",
+  "dependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/node": "^7.14.9",
+    "@babel/parser": "^7.15.3",
+    "babel-loader": "^8.2.2",
+    "serverless": "^2.56.0",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline-lambda": "^1.0.6",
+    "serverless-offline-scheduler": "^0.5.0"
+  },
+  "devDependencies": {
+    "serverless-bundle": "^5.0.0",
+    "serverless-offline": "^8.0.0",
+    "serverless-offline-lambda": "^1.0.6"
+  }
+}

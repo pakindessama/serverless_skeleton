@@ -1,0 +1,77 @@
+# serverless.yml
+service: my-serverless-application
+custom:
+  service: my-serverless-application
+  stage: ${opt:stage, self:provider.stage}
+  resPrefix: ${self:custom.service}-${self:custom.stage}
+  dataTableName: ${self:custom.resPrefix}-data
+  mediaBucket: ${self:custom.resPrefix}-data-bucket
+
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: false
+      migrate: true
+      dbPath: ./.dynamodb/
+      convertEmptyValues: true
+      #noStart: true
+    migration:
+      dir: offline/migrations
+    stages:
+      - offline
+
+  serverless-offline:
+    httpPort: 4000
+    lambdaPort: 4002
+    allowCache: true
+    useChildProcesses: true
+    endpoint: http://localhost:4002
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+  #https://serverless-stack.com/chapters/add-support-for-es6-and-typescript.html to support es6 format
+  - serverless-bundle
+  
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: ${file(./stages/config.${self:provider.stage}.json):awsRegion}
+  
+  environment:
+    awsLambdaEndpoint: ${file(./stages/config.${self:provider.stage}.json):awsLambdaEndpoint}
+    dynamoRegion: ${file(./stages/config.${self:provider.stage}.json):dynamoRegion}
+    dynamoHost: ${file(./stages/config.${self:provider.stage}.json):dynamoHost}
+    dataTableName: ${self:custom.dataTableName}
+
+
+  #iam permissons
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 
+          - S3:*  
+          Resource: "arn:aws:s3::*"
+        - Effect: Allow
+          Action: 
+          - dynamodb:*  
+          Resource: "arn:aws:dynamodb:*:*:*"
+        - Effect: Allow
+          Action: 
+          - ses:SEndEmail
+          - ses:SendRawEmail  
+          - sns:Publish
+          Resource: "*"
+        - Effect: Allow
+          Action: 
+          - 'ssm:GetParameters'
+          - 'ssm:PutParameters'  
+          Resource: "*"
+
+functions:
+  - ${file(yml_resources/functions.yml)}
+      
+resources:
+  - ${file(yml_resources/ddb-data.yml)}

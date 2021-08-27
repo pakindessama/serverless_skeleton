@@ -1,0 +1,22 @@
+{
+    "cfgName":"config.offline.json"
+    ,"cfg":"offline"
+    ,"siteProtocol":"http"
+    ,"apiProtocol":"http"
+  
+    ,"_________AWS_Config":"-----------------------------"
+    ,"awsAccessKeyId":""
+    ,"awsSecretAccessKey":""
+    ,"awsRegion":"us-east-1"
+ 
+    ,"notification_sesRegion":"eu-west-1"
+    ,"notification_sesAccessKeyId": ""
+    ,"notification_sesSecretAccessKey": ""
+    ,"awsLambdaEndpoint": "http://localhost:4000"
+
+    
+
+    ,"dynamoRegion":"localhost"
+    ,"dynamoHost":"http://localhost:8000"
+ 
+}
