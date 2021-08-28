@@ -2,6 +2,10 @@
 
 Serverless service which provides a basic scaffold.
 
+```
+install aws-sdk from https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html
+```
+
 
 ```
 Steps for the first run
@@ -21,7 +25,7 @@ sls dynamodb install
 ```
 sls offline start 
 ```
-> Keep it running > Open a new terminal and run:
+Open a new terminal and run:
 ```
     - sls dynamodb start --migrate
 ```
