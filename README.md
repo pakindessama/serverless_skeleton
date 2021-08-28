@@ -6,13 +6,27 @@ Serverless service which provides a basic scaffold.
 ```
 Steps for the first run
 ```
+```
 npm install -g serverless
+```
+```
 npm install
+```
+```
 npm install -g dynamodb-admin
+```
+```
 sls dynamodb install
-sls offline start > Keep it running > Open a new terminal and run:
+```
+```
+sls offline start 
+```
+``
+> Keep it running > Open a new terminal and run:
+```
+```
     - sls dynamodb start --migrate
-
+```
 
 ## AWS services used
 
