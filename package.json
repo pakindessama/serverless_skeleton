@@ -2,8 +2,8 @@
   "scripts": {
     "babelNode": "babel-node --presets @babel/preset-env",
     "offline": "serverless offline start --stage offline & DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
-    "deploydev": "serverless deploy -v -c serverless.yml --aws-profile default --stage dev",
-    "deployuat": "serverless deploy -v -c serverless.yml --aws-profile default --stage uat"
+    "deploydev": "serverless deploy --verbose -c serverless.yml --aws-profile default --stage dev",
+    "deployuat": "serverless deploy --verbose -c serverless.yml --aws-profile default --stage uat"
   },
   "main": "handler.js",
   "dependencies": {

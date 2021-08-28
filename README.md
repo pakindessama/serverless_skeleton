@@ -58,3 +58,12 @@ Make sure that you use Serverless v1.
 - Lambda
 - API Gateway
 - DynamoDB
+
+## How to deploy?
+
+3 possible stages: offline, dev, uat.
+The config files are in the stage folder
+
+- npm run offline
+- npm run deploydev
+- npm run deployuat
