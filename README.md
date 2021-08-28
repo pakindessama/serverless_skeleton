@@ -21,9 +21,7 @@ sls dynamodb install
 ```
 sls offline start 
 ```
-``
 > Keep it running > Open a new terminal and run:
-```
 ```
     - sls dynamodb start --migrate
 ```
