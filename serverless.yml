@@ -1,7 +1,7 @@
 # serverless.yml
-service: my-serverless-application
+service: keneya
 custom:
-  service: my-serverless-application
+  service: keneya
   stage: ${opt:stage, self:provider.stage}
   resPrefix: ${self:custom.service}-${self:custom.stage}
   dataTableName: ${self:custom.resPrefix}-data

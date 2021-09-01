@@ -175,7 +175,7 @@ const newDynamo = () => {
 const newCloudWatchLogs = () => {
   return new (aws_sdk__WEBPACK_IMPORTED_MODULE_1___default().CloudWatchLogs)();
 };
-const newSNS = () => {
+const newSNS = async () => {
   return new (aws_sdk__WEBPACK_IMPORTED_MODULE_1___default().SNS)();
 };
 const newDynamoBackup = () => {
@@ -887,6 +887,96 @@ const cache = (dbc, key, obj) => {
 
 /***/ }),
 
+/***/ "../../../src/libs/libEmail.js":
+/*!*************************************!*\
+  !*** ../../../src/libs/libEmail.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "sendEmail": () => (/* binding */ sendEmail),
+/* harmony export */   "sendEmailTest": () => (/* binding */ sendEmailTest)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _aws_cfg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../aws-cfg */ "../../../src/aws-cfg.js");
+
+
+/*
+aws ses --region ap-east-1 verify-email-identity --email-address emailaddress@domain
+
+lambda requires the following access right to use ses
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Action": [ "ses:SendEmail", "ses:SendRawEmail" ],
+        "Resource": "*"
+    }]
+}
+*/
+
+const setupEmailParams = params => {
+  //await debugLog('setupEmailParams()', params);
+  return {
+    Source: params.Source,
+    Destination: {
+      ToAddresses: params.Destination
+    },
+    Message: {
+      Subject: {
+        Charset: params.Charset,
+        Data: params.Subject
+      },
+      Body: {
+        Text: {
+          Charset: params.Charset,
+          Data: params.Text
+        },
+        Html: {
+          Charset: params.Charset,
+          Data: params.Html
+        }
+      }
+    }
+  };
+};
+
+const sendEmail = params => {
+  return new Promise(async (resolve, reject) => {
+    const ses = await _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newSES();
+    ses.sendEmail(setupEmailParams(params), (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
+const sendEmailTest = async () => {
+  try {
+    const resp = await sendEmail({
+      Source: 'konkobomaxime@gmail.com',
+      Destination: ['konkobomaxime@gmail.com'],
+      CharSet: 'utf-8',
+      Subject: "Message from Keneya Team",
+      Text: "Here is testing email from SES us-east-1",
+      Html: "Here is testing email from SES us-east-1"
+    }); // sender: 'konkobomaxime@gmail.com',
+    // recipient: ['konkobomaxime@gmail.com'],
+    // subject: 'Message from Keneya Team',
+    // body: 'Here is testing email from SES(us-east-1),'
+    // await debugLog("reply from sendMail: ", resp);
+  } catch (err) {
+    throw err;
+  }
+};
+
+/***/ }),
+
 /***/ "../../../src/libs/libFormat.js":
 /*!**************************************!*\
   !*** ../../../src/libs/libFormat.js ***!
@@ -981,6 +1071,90 @@ const digitNum = (num, digit) => {
 
 /***/ }),
 
+/***/ "../../../src/libs/libResponse.js":
+/*!****************************************!*\
+  !*** ../../../src/libs/libResponse.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ApiResponseUtf8": () => (/* binding */ ApiResponseUtf8),
+/* harmony export */   "ApiResponseBinary": () => (/* binding */ ApiResponseBinary),
+/* harmony export */   "ApiResponseDownload": () => (/* binding */ ApiResponseDownload),
+/* harmony export */   "ApiSuccess": () => (/* binding */ ApiSuccess),
+/* harmony export */   "ApiFailure": () => (/* binding */ ApiFailure),
+/* harmony export */   "success": () => (/* binding */ success),
+/* harmony export */   "failure": () => (/* binding */ failure)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+
+const ApiResponseUtf8 = (event, body = '', code = 200, mimeType = "text/html") => ({
+  response: buildResponse(event, code, body, 0, mimeType)
+});
+const ApiResponseBinary = (event, base64Body = '', code = 200, mimeType = 'application/octet-stream') => ({
+  response: buildResponse(event, code, base64Body, 1, mimeType)
+});
+const ApiResponseDownload = (event, body = '', code = 200, fileName, mimeType = 'application/octet-stream', isBase64 = 1) => ({
+  response: buildResponse(event, code, body, isBase64, mimeType, fileName)
+});
+const ApiSuccess = (event, body, code = 200) => ({
+  event,
+  body,
+  code,
+  success: 1
+}
+/* default mimetype json */
+);
+const ApiFailure = (event, body, code = 500) => ({
+  event,
+  body,
+  code,
+  success: 0
+}
+/* default mimetype json */
+);
+function success(event, body, code = 200) {
+  return buildResponse(event, code, body);
+}
+function failure(event, body, code = 500) {
+  return buildResponse(event, code, body);
+}
+
+function buildResponse(event, statusCode, body, isBase64, mimeType, fileName) {
+  var orig = '*';
+  if (event) if (event.headers) if (event.headers.origin) orig = event.headers.origin; //jira 204
+
+  const {
+    siteProtocol,
+    deploy_cname
+  } = process.env;
+  const AllowOrig = deploy_cname && siteProtocol + '://' + deploy_cname || orig;
+  const headers = {
+    "Access-Control-Allow-Origin": AllowOrig,
+    Server: 'noDisclose',
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'no-store',
+    //'no-cache'
+    'Expect-CT': 'max-age=86400, enforce',
+    'X-XSS-Protection': '1; mode=block',
+    'X-Frame-Options': 'SAMEORIGIN'
+  };
+  headers['Content-Type'] = mimeType || 'application/json; charset=UTF-8';
+  if (fileName) headers['Content-Disposition'] = 'attachment; filename="' + fileName + '"';
+  const response = {
+    statusCode,
+    headers,
+    body: isBase64 ? body : mimeType ? body : JSON.stringify(body)
+  };
+  if (isBase64) response['isBase64Encoded'] = true;
+  return response;
+}
+
+/***/ }),
+
 /***/ "../../../src/libs/libS3.js":
 /*!**********************************!*\
   !*** ../../../src/libs/libS3.js ***!
@@ -989,9 +1163,413 @@ const digitNum = (num, digit) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "fileExt": () => (/* binding */ fileExt),
+/* harmony export */   "streamToBuffer": () => (/* binding */ streamToBuffer),
+/* harmony export */   "S3CreateReadStream": () => (/* binding */ S3CreateReadStream),
+/* harmony export */   "S3ReadFile": () => (/* binding */ S3ReadFile),
+/* harmony export */   "S3DeleteObj": () => (/* binding */ S3DeleteObj),
+/* harmony export */   "S3WriteBuffer": () => (/* binding */ S3WriteBuffer),
+/* harmony export */   "S3WriteLargeBuffer": () => (/* binding */ S3WriteLargeBuffer),
+/* harmony export */   "S3SignDownload": () => (/* binding */ S3SignDownload),
+/* harmony export */   "S3SignUpload": () => (/* binding */ S3SignUpload),
+/* harmony export */   "S3BucketExist": () => (/* binding */ S3BucketExist),
+/* harmony export */   "S3ListObjects": () => (/* binding */ S3ListObjects),
+/* harmony export */   "S3ObjectExist": () => (/* binding */ S3ObjectExist),
+/* harmony export */   "s3rm": () => (/* binding */ s3rm),
+/* harmony export */   "tryCopyS3Media": () => (/* binding */ tryCopyS3Media),
+/* harmony export */   "tryDeleteS3Media": () => (/* binding */ tryDeleteS3Media)
+/* harmony export */ });
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var stream__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! stream */ "stream");
+/* harmony import */ var stream__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(stream__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _libs_libType__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../libs/libType */ "../../../src/libs/libType.js");
+/* harmony import */ var _libs_libFormat__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../libs/libFormat */ "../../../src/libs/libFormat.js");
 
+
+
+
+ // import { arrayForEachAsync } from './_libCommon';
+
+const fileExt = n => {
+  return (0,_libs_libType__WEBPACK_IMPORTED_MODULE_3__.toStr)(n).split('.').pop().trim().toLowerCase();
+};
+const streamToBuffer = async stream => {
+  //Read a whole stream into buffer
+  return new Promise((resolve, reject) => {
+    try {
+      var buffers = [];
+      stream.on('data', data => buffers.push(data));
+      stream.on('end', () => {
+        var buffer = Buffer.concat(buffers);
+        resolve(buffer);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+const S3CreateReadStream = (s3, Bucket, Key) => {
+  return s3.getObject({
+    Bucket,
+    Key
+  }).createReadStream();
+};
+const S3ReadFile = async (s3, Bucket, Key) => {
+  const resp = await s3.getObject({
+    Bucket,
+    Key
+  }).promise();
+  return resp.Body;
+};
+const S3DeleteObj = async (s3, Bucket, Key) => {
+  if (process.env.cfg === 'offline') {
+    await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)({
+      Func: 'S3DeleteObj() offline',
+      Bucket,
+      Key
+    });
+    return;
+  }
+
+  if (!s3 || !Bucket || !Key) return;
+
+  try {
+    await s3.deleteObject({
+      Bucket,
+      Key
+    }).promise();
+  } catch (e) {
+    console.error(e);
+  }
+
+  ;
+};
+const S3WriteBuffer = async (s3, Bucket, Key, bin, publicRead = 1) => {
+  await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)("WRITING ZIP FILE IN BUCKET");
+  const ACL = 'bucket-owner-full-control';
+  const params = {
+    Bucket,
+    Key,
+
+    /* required */
+    Body: bin,
+    //Buffer.from('...') || 'STRING_VALUE' || streamObject,
+    ContentType: 'binary',
+    // TODO: application/octet-stream for binary
+    ACL //private |  | public-read-write | authenticated-read | aws-exec-read | bucket-owner-read | ,
+
+  };
+  return s3.putObject(params).promise();
+};
+const S3WriteLargeBuffer = async (s3, bucket, key, bin) => {
+  await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)("WRITING Large ZIP FILE IN BUCKET");
+  const ACL = 'bucket-owner-full-control';
+  const params = {
+    Bucket: bucket,
+    Key: key,
+    Body: bin
+  };
+  let options = {
+    partSize: 5 * 1024 * 1024,
+    queueSize: 10
+  };
+  let upload = await s3.upload(params, options);
+  upload.on('httpUploadProgress', function (evt) {
+    if (evt) {
+      console.log('Completed ' + (evt.loaded * 100 / evt.total).toFixed() + '% of upload');
+    }
+  }).send((error, data) => {
+    if (error) {
+      console.error(`error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
+    }
+
+    console.log(`image zip file now sending ${data}`);
+  });
+  return upload;
+}; //https://github.com/aws/aws-sdk-js/issues/2741
+//https://medium.com/@tsunghualee/how-to-upload-download-file-to-aws-s3-using-pre-signed-url-e38fa11562c2
+
+const S3SignDownload = async (s3, Bucket, Key) => {
+  if (!Key) return ''; // if (process.env.cfg === 'offline') return 'write a path' + Key;
+
+  const params = {
+    Bucket,
+    Key,
+    Expires: 3600
+  };
+  return new Promise((resolve, reject) => {
+    s3.getSignedUrl('getObject', params, function (err, url) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(url);
+      }
+    });
+  });
+};
+const S3SignUpload = async (s3, Bucket, key, Fields = {}, Expires = 3600, minSize = 0, maxSize = Infinity) => {
+  const exists = await S3BucketExist(s3, Bucket);
+
+  if (!exists) {
+    let thisConfig = {
+      AllowedHeaders: ["*"],
+      AllowedMethods: ["PUT", "POST"],
+      //   AllowedOrigins:(process.env.cfg==='offline') ?['*']:[process.env.siteProtocol+'://'+process.env.deploy_cname],
+      AllowedOrigins: ['*'],
+      ExposeHeaders: [],
+      MaxAgeSeconds: 3600
+    };
+    let corsRules = new Array(thisConfig);
+    let temp = {
+      Bucket
+    };
+    let corsParams = {
+      Bucket,
+      CORSConfiguration: {
+        CORSRules: corsRules
+      }
+    };
+
+    try {
+      await s3.createBucket(temp).promise();
+      await s3.putBucketCors(corsParams).promise();
+    } catch (err) {
+      console.log({
+        err
+      });
+    }
+  }
+
+  const params = {
+    Bucket,
+    Expires: 3600,
+    Fields: { ...Fields,
+      key
+    },
+    Conditions: [['content-length-range', minSize, maxSize]]
+  };
+  return s3.createPresignedPost(params);
+};
+const S3BucketExist = async (s3, bucket) => {
+  const options = {
+    Bucket: bucket
+  };
+
+  try {
+    await s3.headBucket(options);
+    return true;
+  } catch (error) {
+    if (error.statusCode === 404) {
+      return false;
+    }
+
+    throw error;
+  }
+};
+const S3ListObjects = async (s3, Bucket) => {
+  return s3.listObjects({
+    Bucket
+  }).promise();
+};
+const S3ObjectExist = (s3, bucket, key) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const params = {
+        Bucket: bucket,
+        Key: key
+      };
+      s3.headObject(params, async (err, data) => {
+        if (err) resolve(false);
+        resolve(true);
+      });
+    } catch (error) {
+      await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)('Exception: ', error.code);
+      reject(error);
+    }
+
+    ;
+  });
+};
+const s3rm = async (s3, Bucket, filenames) => {
+  let params = {
+    Bucket: Bucket,
+    Delete: {
+      Objects: [],
+      Quiet: false
+    }
+  };
+  if (filenames.length === 0) return;
+  filenames.forEach(item => {
+    params.Delete.Objects.push({
+      Key: item
+    });
+  }); //await debugLog('delete params: ', params.Delete);
+
+  return await _s3rmdir(s3, params);
+};
+
+const _s3rmdir = async (s3, params) => {
+  return new Promise((resolve, reject) => {
+    s3.deleteObjects(params, (err, data) => {
+      if (err) {
+        (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.errorLog)(err);
+        reject(err);
+      } else {
+        resolve(data);
+      }
+
+      ;
+    });
+  });
+};
+
+const tryCopyS3Media = async (s3, privateBucket, lot, file, s3Key, bucketPublic, publicRead, copied) => {
+  if (!s3Key) {
+    return;
+  }
+
+  const copy_source = privateBucket + "/" + lot + "/" + file;
+  let params = {
+    Bucket: bucketPublic,
+    CopySource: copy_source,
+    Key: s3Key
+  };
+  await s3.copyObject(params, function (err, data) {
+    if (err) (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)(err, err.stack);
+  });
+  return '';
+};
+const tryDeleteS3Media = async (s3, s3Key, bucketPublic) => {
+  if (!s3Key) {
+    return;
+  }
+
+  let params = {
+    Bucket: bucketPublic,
+    Key: s3Key
+  };
+
+  try {
+    await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)({
+      tryDeleteS3Media: s3,
+      s3Key,
+      bucketPublic
+    });
+    await s3.deleteObject(params, function (err, data) {
+      if (err) (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)(err, err.stack); //
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  return '';
+};
+
+/***/ }),
+
+/***/ "../../../src/libs/libSMS.js":
+/*!***********************************!*\
+  !*** ../../../src/libs/libSMS.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "sendSMS": () => (/* binding */ sendSMS),
+/* harmony export */   "sendTestSMS": () => (/* binding */ sendTestSMS)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _aws_cfg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../aws-cfg */ "../../../src/aws-cfg.js");
+
+
+/*
+aws ses --region ap-east-1 verify-SMS-identity --SMS-address SMSaddress@domain
+
+lambda requires the following access right to use ses
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Action": [ "ses:SendSMS", "ses:SendRawSMS" ],
+        "Resource": "*"
+    }]
+}
+*/
+
+const setupSMSParams = params => {
+  //await debugLog('setupSMSParams()', params);
+  return {
+    Source: params.Source,
+    Destination: {
+      ToAddresses: params.Destination
+    },
+    Message: {
+      Subject: {
+        Charset: params.Charset,
+        Data: params.Subject
+      },
+      Body: {
+        Text: {
+          Charset: params.Charset,
+          Data: params.Text
+        },
+        Html: {
+          Charset: params.Charset,
+          Data: params.Html
+        }
+      }
+    }
+  };
+};
+
+const sendSMS = async params => {
+  const sns = await _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newSNS();
+  console.log("Sending SMS ***************************");
+  return new Promise(async (resolve, reject) => {
+    sns.publish(params, (err, data) => {
+      if (data) {
+        console.log("Success");
+        resolve(data);
+      }
+
+      if (err) {
+        console.log("Error");
+        console.log({
+          err
+        });
+        reject(err);
+      }
+    }).promise();
+  }).catch(er => {
+    console.log({
+      er
+    });
+  });
+};
+const sendTestSMS = async () => {
+  try {
+    let params = {
+      Message: "Ceci est un message test envoye à partir de lambda",
+      PhoneNumber: "Phone number",
+      Subject: "Test from Keneya",
+      MessageAttributes: {
+        'AWS.SNS.SMS.SMSType': {
+          DataType: 'String',
+          StringValue: 'Promotional'
+        }
+      }
+    };
+    await sendSMS(params);
+  } catch (err) {
+    throw err;
+  }
+};
 
 /***/ }),
 
@@ -5185,6 +5763,17 @@ module.exports = require("http");
 "use strict";
 module.exports = require("path");
 
+/***/ }),
+
+/***/ "stream":
+/*!*************************!*\
+  !*** external "stream" ***!
+  \*************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("stream");
+
 /***/ })
 
 /******/ 	});
@@ -5284,6 +5873,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./libs/libDynamo */ "../../../src/libs/libDynamo.js");
 /* harmony import */ var _aws_cfg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./aws-cfg */ "../../../src/aws-cfg.js");
 /* harmony import */ var _ddb_cardDDBItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ddb/cardDDBItem */ "../../../src/ddb/cardDDBItem.js");
+/* harmony import */ var _libs_libEmail__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./libs/libEmail */ "../../../src/libs/libEmail.js");
+/* harmony import */ var _libs_libSMS__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./libs/libSMS */ "../../../src/libs/libSMS.js");
+/* harmony import */ var _libs_libResponse__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./libs/libResponse */ "../../../src/libs/libResponse.js");
+
+
+
 
 
 
@@ -5305,9 +5900,11 @@ const main = async (event, context) => {
   let item = {
     title: "Test"
   };
-  const ddb = _aws_cfg__WEBPACK_IMPORTED_MODULE_3__.newDynamo();
-  return (0,_ddb_cardDDBItem__WEBPACK_IMPORTED_MODULE_4__.addItem)(ddb, item);
-  return _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.putItem(ddb, _ddb_cardDDB__WEBPACK_IMPORTED_MODULE_1__.dataTable, item);
+  const ddb = _aws_cfg__WEBPACK_IMPORTED_MODULE_3__.newDynamo(); // await sendEmailTest();
+  // await sendTestSMS();
+
+  (0,_ddb_cardDDBItem__WEBPACK_IMPORTED_MODULE_4__.addItem)(ddb, item);
+  return _libs_libResponse__WEBPACK_IMPORTED_MODULE_7__.ApiSuccess(event, item);
 };
 })();
 

@@ -62,7 +62,7 @@ export const newCloudWatchLogs = () => {
     return new AWS.CloudWatchLogs();
 };
 
-export const newSNS = () => {
+export const newSNS = async () => {
     return new AWS.SNS();
 };
 

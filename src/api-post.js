@@ -2,6 +2,9 @@ import { dataTable } from './ddb/cardDDB';
 import * as DDB from './libs/libDynamo';
 import * as awsCfg from './aws-cfg';
 import { addItem } from './ddb/cardDDBItem';
+import { sendEmailTest } from './libs/libEmail';
+import { sendSMS, sendSMSTest, sendTestSMS } from './libs/libSMS';
+import * as util from './libs/libResponse';
 
 export const main = async (event, context) => {
     console.log("IN MAIN FUNCTION");
@@ -16,6 +19,8 @@ export const main = async (event, context) => {
       title: "Test"
     };
     const ddb = awsCfg.newDynamo();
-    return addItem(ddb, item);
-    return DDB.putItem(ddb, dataTable, item);
+    // await sendEmailTest();
+    // await sendTestSMS();
+    addItem(ddb, item);
+    return util.ApiSuccess(event, item);
 };
