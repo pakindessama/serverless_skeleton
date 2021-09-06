@@ -12,6 +12,7 @@
     "@babel/parser": "^7.15.3",
     "babel-loader": "^8.2.2",
     "serverless": "^2.56.0",
+    "serverless-dotenv-plugin": "^3.9.0",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline-lambda": "^1.0.6",
     "serverless-offline-scheduler": "^0.5.0"

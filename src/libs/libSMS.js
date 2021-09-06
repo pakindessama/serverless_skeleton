@@ -50,8 +50,8 @@ export const sendSMS = async(params) => {
 export const sendTestSMS = async () => {
     try {
         let params = {
-            Message: "Ceci est un message test envoye à partir de lambda",
-            PhoneNumber: "Phone number",
+            Message: "Ceci est un message test envoye de l'equipe Keneya envoye a partir du code",
+            PhoneNumber: "+22671161976",
             Subject: "Test from Keneya",
             MessageAttributes: {
                 'AWS.SNS.SMS.SMSType' : {

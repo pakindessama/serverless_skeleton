@@ -7,7 +7,7 @@ export const debugMode = async () => {
 export const debugLog = async (...t) => {
     if(process.env.cfg && (toInt(await getEnv('admin_logLevel')) < 1)) return;
     return true;
-};
+}; 
 
 
 //2020-12-01T08:07:14.085Z	07cfb56f-72f0-4390-923d-54da1d85cee1	ERROR	test error

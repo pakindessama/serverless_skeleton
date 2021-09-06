@@ -45,6 +45,9 @@ const ssmCheckExpire = () => {
 };
 
 const getEnv = async (name, _stage = '') => {
+  console.log({
+    _stage
+  });
   ssmCheckExpire();
   await getEnvs([name], _stage);
   return __envCache[name];
@@ -56,6 +59,9 @@ const getEnvs = async (envNames = [], _stage = '') => {
   ssmCheckExpire(); // load cache missing 
 
   const stage = _stage || process.env.cfg;
+  console.log({
+    envNames
+  });
   const cacheKeys = Object.keys(__envCache);
 
   if (stage !== 'offline') {
@@ -194,7 +200,8 @@ const newDynamoBackup = () => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "dataTable": () => (/* binding */ dataTable),
-/* harmony export */   "CodeItem": () => (/* binding */ CodeItem)
+/* harmony export */   "CodeItem": () => (/* binding */ CodeItem),
+/* harmony export */   "CodePatient": () => (/* binding */ CodePatient)
 /* harmony export */ });
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
@@ -202,6 +209,7 @@ __webpack_require__.r(__webpack_exports__);
 const singleTable = process.env.dataTableName;
 const dataTable = singleTable;
 const CodeItem = 'CI';
+const CodePatient = 'CP';
 
 /***/ }),
 
@@ -1139,6 +1147,12 @@ const S3SignDownload = async (s3, Bucket, Key) => {
 };
 const S3SignUpload = async (s3, Bucket, key, Fields = {}, Expires = 3600, minSize = 0, maxSize = Infinity) => {
   const exists = await S3BucketExist(s3, Bucket);
+  console.log({
+    s3
+  });
+  console.log({
+    Bucket
+  });
 
   if (!exists) {
     let thisConfig = {

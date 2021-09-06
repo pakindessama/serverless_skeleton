@@ -15,7 +15,7 @@
     ,"awsLambdaEndpoint": "http://localhost:4000"
 
     
-
+    ,"media_bucket":"media"
     ,"dynamoRegion":"localhost"
     ,"dynamoHost":"http://localhost:8000"
  

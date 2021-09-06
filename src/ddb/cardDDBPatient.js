@@ -1,35 +1,36 @@
 import * as cfg from '../aws-cfg';
 import * as DDB from '../libs/libDynamo';
-import { CodeItem, dataTable } from './cardDDB';
+import { dataTable, CodePatient } from './cardDDB';
 import {debugLog} from '../libs/libFormat';
 import {fileExt, S3DeleteObj} from '../libs/libS3';
+import { timeStampNowGMT } from '../libs/libTime';
 
 
-export const fetchAllItems = async(ddb, table, p = 1, rpp=1) => { 
-    return DDB.queryPage(ddb, p, rpp, (p!==1), dataTable, 'ppk=:v0',
-    [CodeItem]);
+export const fetchAllPatients = async(ddb, table, p = 1, rpp=1) => { 
+    return DDB.queryPage(ddb, p, rpp, (p!==1), dataTable, 'ppk=:v0', [CodePatient]);
 };
 
-
-export const fetchItemsBySks = async(ddb, itemSKs, table) => {
-    const Keys = DDB.batchKeys({ppk:CodeItem}, 'psk', itemSKs);
+export const fetchpatientsBySks = async(ddb, patientSKs, table) => {
+    const Keys = DDB.batchKeys({ppk:CodePatient}, 'psk', patientSKs);
     return DDB.batchGetAll(ddb, table||dataTable, Keys);
 };
-export const fetchItemBySK = async(ddb, itemId, table) => {
-    return DDB.fetchRow(ddb, table||dataTable, {psk:itemId, ppk:CodeItem});
+export const fetchpatientBySK = async(ddb, patientId, table) => {
+    return DDB.fetchRow(ddb, table||dataTable, {psk:patientId, ppk:CodePatient});
 };
 
 // Modified function 
-export const addItem = async (ddb, r, table) => {
-    let item = {...r, code:CodeItem};
-    item.ppk = CodeItem;
-    item.psk = r.title;
-    return DDB.putItem(ddb, table||dataTable, item);
+export const addPatient = async (ddb, r, table) => {
+    const now = timeStampNowGMT();
+    const psk = DDB.joinIds(r.userId, now);
+    const patient = {...r, code:CodePatient};
+    patient.ppk = CodePatient;
+    patient.psk = psk;
+    return DDB.putItem(ddb, table||dataTable, patient);
 };
 
-export const deleteItem = async (ddb, r, table) => {
-    let item = {};
-    item.psk = r.title;
-    item.ppk = CodeItem;
-    await DDB.deleteItem(ddb, table||dataTable, item);
+export const deletepatient = async (ddb, r, table) => {
+    let patient = {};
+    patient.psk = r.title;
+    patient.ppk = CodePatient;
+    await DDB.deletepatient(ddb, table||dataTable, patient);
 };

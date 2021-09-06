@@ -1,6 +1,213 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "../../../src/apis/apiCommon.js":
+/*!**************************************!*\
+  !*** ../../../src/apis/apiCommon.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "apiLogout": () => (/* binding */ apiLogout),
+/* harmony export */   "apiLogin": () => (/* binding */ apiLogin),
+/* harmony export */   "apiTokenLogin": () => (/* binding */ apiTokenLogin),
+/* harmony export */   "apiUpload": () => (/* binding */ apiUpload),
+/* harmony export */   "apiDownload": () => (/* binding */ apiDownload),
+/* harmony export */   "apiUploadMedia": () => (/* binding */ apiUploadMedia),
+/* harmony export */   "apiDownloadMedia": () => (/* binding */ apiDownloadMedia)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _aws_cfg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../aws-cfg */ "../../../src/aws-cfg.js");
+/* harmony import */ var _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../libs/_libCommon */ "../../../src/libs/_libCommon.js");
+/* harmony import */ var _libs_libS3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../libs/libS3 */ "../../../src/libs/libS3.js");
+/* harmony import */ var _libs_libFormat__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../libs/libFormat */ "../../../src/libs/libFormat.js");
+/* harmony import */ var _apis_appEnv__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../apis/appEnv */ "../../../src/apis/appEnv.js");
+
+
+
+
+
+
+
+const getSettings = async () => {};
+
+const clearLogin = async (evt, ctx, req, session, ddb, s3, deleteSession) => {}; // export const apiSysVer =  async (evt, ctx, req, session, ddb) => {
+//     return util.ApiSuccess(evt, {
+//         codebuild_start_time: process.env.codebuild_start_time,
+//         codebuild_source_version: process.env.codebuild_source_version,
+//         codebuild_build_number: process.env.codebuild_build_number,
+//     });
+// };
+// export const apiInit = async (evt, ctx, req, session, ddb) => {
+//     debugLog("IN INIT");
+//     //return as ApiLogin For Resume Refresh
+//     const ret = {req};
+//     const local = (process.env.cfg === 'offline');
+//     ret.settings = await getSettings();
+//     ret.user = session.user;
+//     return util.ApiSuccess(evt, ret);
+// };
+
+
+const apiLogout = async (evt, ctx, req, session, ddb) => {
+  await clearLogin(evt, ctx, req, session, ddb, _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newS3(), 1);
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(evt, {
+    user: false,
+    sessionId: ''
+  });
+};
+
+const setupLoginSession = (session, evt) => {// session.sessionStart = timeStampNowGMT();
+  // session.userAgent = getAgentLine(evt);
+  // session.code = 'SESS';
+};
+
+const apiLogin = async (evt, ctx, req, session, ddb) => {
+  (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)("************login******");
+  const ret = {
+    errs: []
+  };
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(evt, ret);
+};
+const apiTokenLogin = async (evt, ctx, req, session, ddb) => {
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(evt, ret);
+};
+const s3key = "testdir/testfile.txt";
+const apiUpload = async (evt, ctx, req) => {
+  const s3 = _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newS3();
+  const postUrl = await (0,_libs_libS3__WEBPACK_IMPORTED_MODULE_3__.S3SignUpload)(s3, (0,_apis_appEnv__WEBPACK_IMPORTED_MODULE_5__.getEnv)('bucket'), s3key, {
+    k1: 'v1',
+    k2: 'v2'
+  }, 3600, 0, 10000000); //await debugLog('S3SignUpload()', { postUrl });
+
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(evt, {
+    postUrl
+  });
+};
+const apiDownload = async (evt, ctx, req) => {
+  const s3 = _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newS3();
+  const u = await (0,_libs_libS3__WEBPACK_IMPORTED_MODULE_3__.S3SignDownload)(s3, (0,_apis_appEnv__WEBPACK_IMPORTED_MODULE_5__.getEnv)('bucket'), s3key); //const res = { statusCode: 301, headers: { Location: 'https://google.com',}};
+  //await debugLog('apiDownload', u || res);
+
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(evt, {
+    body: u
+  });
+};
+const apiUploadMedia = async (key, bin, publicRead) => {
+  const s3 = _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newS3();
+  const bucket = await (0,_apis_appEnv__WEBPACK_IMPORTED_MODULE_5__.getEnv)('mediaBucket');
+  const minSize = 0;
+  const maxSize = 100000000;
+  const postUrl = await (0,_libs_libS3__WEBPACK_IMPORTED_MODULE_3__.S3SignUpload)(s3, bucket, key, {}, 3600, minSize, maxSize);
+  await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)('S3SignUpload()', {
+    postUrl
+  }); // console.log('S3SignUpload()', { postUrl });
+
+  return postUrl;
+};
+const apiDownloadMedia = async key => {
+  const s3 = _aws_cfg__WEBPACK_IMPORTED_MODULE_1__.newS3();
+  const bucket = await (0,_apis_appEnv__WEBPACK_IMPORTED_MODULE_5__.getEnv)('mediaBucket');
+  const url = await (0,_libs_libS3__WEBPACK_IMPORTED_MODULE_3__.S3SignDownload)(s3, bucket, key); //const res = { statusCode: 301, headers: { Location: 'https://google.com',}};
+
+  await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_4__.debugLog)('apiDownload', url);
+  return url;
+};
+
+/***/ }),
+
+/***/ "../../../src/apis/apiGet.js":
+/*!***********************************!*\
+  !*** ../../../src/apis/apiGet.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "apiTest": () => (/* binding */ apiTest),
+/* harmony export */   "apiTest2": () => (/* binding */ apiTest2),
+/* harmony export */   "apiGetPatientByUser": () => (/* binding */ apiGetPatientByUser),
+/* harmony export */   "apiGetVaccineByPatient": () => (/* binding */ apiGetVaccineByPatient),
+/* harmony export */   "apiGetNewsBy": () => (/* binding */ apiGetNewsBy),
+/* harmony export */   "apiGetVaccinesByCountry": () => (/* binding */ apiGetVaccinesByCountry),
+/* harmony export */   "apiGetAllPatients": () => (/* binding */ apiGetAllPatients)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ddb_cardDDBPatient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ddb/cardDDBPatient */ "../../../src/ddb/cardDDBPatient.js");
+/* harmony import */ var _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../libs/_libCommon */ "../../../src/libs/_libCommon.js");
+
+
+
+const apiTest = (event, context, request, ddb) => {
+  console.log({
+    Test: request
+  });
+  const ret = {};
+  ret.test = "OK";
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(event, ret);
+};
+const apiTest2 = (event, context, request, ddb) => {
+  console.log({
+    Test2: request
+  });
+  return {
+    test: 'test2'
+  };
+};
+const apiGetPatientByUser = user => {};
+const apiGetVaccineByPatient = patient => {};
+const apiGetNewsBy = user => {};
+const apiGetVaccinesByCountry = country => {};
+const apiGetAllPatients = async (event, context, request, ddb) => {
+  const ret = {};
+  ret.test = "OK";
+  const patients = await (0,_ddb_cardDDBPatient__WEBPACK_IMPORTED_MODULE_1__.fetchAllPatients)(ddb);
+  ret.patients = patients;
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess(event, ret);
+};
+
+/***/ }),
+
+/***/ "../../../src/apis/apiUpdate.js":
+/*!**************************************!*\
+  !*** ../../../src/apis/apiUpdate.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "apiUpdateUser": () => (/* binding */ apiUpdateUser),
+/* harmony export */   "apiUpdateUserPatient": () => (/* binding */ apiUpdateUserPatient),
+/* harmony export */   "apiUpdatePatientVaccine": () => (/* binding */ apiUpdatePatientVaccine)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _libs_libCommon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../libs/_libCommon */ "../../../src/libs/_libCommon.js");
+/* harmony import */ var _ddb_cardDDBPatient__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ddb/cardDDBPatient */ "../../../src/ddb/cardDDBPatient.js");
+
+
+
+const apiUpdateUser = async (event, context, request, ddb) => {
+  const patient = request.patient;
+  await (0,_ddb_cardDDBPatient__WEBPACK_IMPORTED_MODULE_2__.addPatient)(db, item, table);
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_1__.ApiSuccess(event, patient);
+};
+const apiUpdateUserPatient = async (event, context, request, ddb) => {
+  const patient = request.patient;
+  patient.userId = 'max';
+  await (0,_ddb_cardDDBPatient__WEBPACK_IMPORTED_MODULE_2__.addPatient)(ddb, patient);
+  return _libs_libCommon__WEBPACK_IMPORTED_MODULE_1__.ApiSuccess(event, patient);
+};
+const apiUpdatePatientVaccine = () => {};
+
+/***/ }),
+
 /***/ "../../../src/apis/appEnv.js":
 /*!***********************************!*\
   !*** ../../../src/apis/appEnv.js ***!
@@ -45,6 +252,9 @@ const ssmCheckExpire = () => {
 };
 
 const getEnv = async (name, _stage = '') => {
+  console.log({
+    _stage
+  });
   ssmCheckExpire();
   await getEnvs([name], _stage);
   return __envCache[name];
@@ -56,6 +266,9 @@ const getEnvs = async (envNames = [], _stage = '') => {
   ssmCheckExpire(); // load cache missing 
 
   const stage = _stage || process.env.cfg;
+  console.log({
+    envNames
+  });
   const cacheKeys = Object.keys(__envCache);
 
   if (stage !== 'offline') {
@@ -194,7 +407,8 @@ const newDynamoBackup = () => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "dataTable": () => (/* binding */ dataTable),
-/* harmony export */   "CodeItem": () => (/* binding */ CodeItem)
+/* harmony export */   "CodeItem": () => (/* binding */ CodeItem),
+/* harmony export */   "CodePatient": () => (/* binding */ CodePatient)
 /* harmony export */ });
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
 /* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
@@ -202,6 +416,7 @@ __webpack_require__.r(__webpack_exports__);
 const singleTable = process.env.dataTableName;
 const dataTable = singleTable;
 const CodeItem = 'CI';
+const CodePatient = 'CP';
 
 /***/ }),
 
@@ -263,6 +478,123 @@ const deleteItem = async (ddb, r, table) => {
   item.ppk = _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodeItem;
   await _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.deleteItem(ddb, table || _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, item);
 };
+
+/***/ }),
+
+/***/ "../../../src/ddb/cardDDBPatient.js":
+/*!******************************************!*\
+  !*** ../../../src/ddb/cardDDBPatient.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "fetchAllPatients": () => (/* binding */ fetchAllPatients),
+/* harmony export */   "fetchpatientsBySks": () => (/* binding */ fetchpatientsBySks),
+/* harmony export */   "fetchpatientBySK": () => (/* binding */ fetchpatientBySK),
+/* harmony export */   "addPatient": () => (/* binding */ addPatient),
+/* harmony export */   "deletepatient": () => (/* binding */ deletepatient)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _aws_cfg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../aws-cfg */ "../../../src/aws-cfg.js");
+/* harmony import */ var _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../libs/libDynamo */ "../../../src/libs/libDynamo.js");
+/* harmony import */ var _cardDDB__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./cardDDB */ "../../../src/ddb/cardDDB.js");
+/* harmony import */ var _libs_libFormat__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../libs/libFormat */ "../../../src/libs/libFormat.js");
+/* harmony import */ var _libs_libS3__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../libs/libS3 */ "../../../src/libs/libS3.js");
+/* harmony import */ var _libs_libTime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../libs/libTime */ "../../../src/libs/libTime.js");
+
+
+
+
+
+
+
+const fetchAllPatients = async (ddb, table, p = 1, rpp = 1) => {
+  return _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.queryPage(ddb, p, rpp, p !== 1, _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, 'ppk=:v0', [_cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient]);
+};
+const fetchpatientsBySks = async (ddb, patientSKs, table) => {
+  const Keys = _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.batchKeys({
+    ppk: _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient
+  }, 'psk', patientSKs);
+  return _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.batchGetAll(ddb, table || _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, Keys);
+};
+const fetchpatientBySK = async (ddb, patientId, table) => {
+  return _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.fetchRow(ddb, table || _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, {
+    psk: patientId,
+    ppk: _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient
+  });
+}; // Modified function 
+
+const addPatient = async (ddb, r, table) => {
+  const now = (0,_libs_libTime__WEBPACK_IMPORTED_MODULE_6__.timeStampNowGMT)();
+  const psk = _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.joinIds(r.userId, now);
+  const patient = { ...r,
+    code: _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient
+  };
+  patient.ppk = _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient;
+  patient.psk = psk;
+  return _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.putItem(ddb, table || _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, patient);
+};
+const deletepatient = async (ddb, r, table) => {
+  let patient = {};
+  patient.psk = r.title;
+  patient.ppk = _cardDDB__WEBPACK_IMPORTED_MODULE_3__.CodePatient;
+  await _libs_libDynamo__WEBPACK_IMPORTED_MODULE_2__.deletepatient(ddb, table || _cardDDB__WEBPACK_IMPORTED_MODULE_3__.dataTable, patient);
+};
+
+/***/ }),
+
+/***/ "../../../src/libs/_libCommon.js":
+/*!***************************************!*\
+  !*** ../../../src/libs/_libCommon.js ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "batchDeleteAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.batchDeleteAll),
+/* harmony export */   "batchGetAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.batchGetAll),
+/* harmony export */   "batchGetAllBySecKey": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.batchGetAllBySecKey),
+/* harmony export */   "batchKeys": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.batchKeys),
+/* harmony export */   "batchPutAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.batchPutAll),
+/* harmony export */   "cache": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.cache),
+/* harmony export */   "copyAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.copyAll),
+/* harmony export */   "ddbNow": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.ddbNow),
+/* harmony export */   "deleteItem": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.deleteItem),
+/* harmony export */   "fetchRow": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.fetchRow),
+/* harmony export */   "joinIds": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.joinIds),
+/* harmony export */   "putItem": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.putItem),
+/* harmony export */   "putItem_": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.putItem_),
+/* harmony export */   "queryAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryAll),
+/* harmony export */   "queryAllV2": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryAllV2),
+/* harmony export */   "queryOnce": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryOnce),
+/* harmony export */   "queryOnceV2": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryOnceV2),
+/* harmony export */   "queryPage": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryPage),
+/* harmony export */   "queryPageV2": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.queryPageV2),
+/* harmony export */   "rows2Ids": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.rows2Ids),
+/* harmony export */   "scanAll": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.scanAll),
+/* harmony export */   "scanN": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.scanN),
+/* harmony export */   "splitIds": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.splitIds),
+/* harmony export */   "stripEmpty": () => (/* reexport safe */ _libDynamo__WEBPACK_IMPORTED_MODULE_1__.stripEmpty),
+/* harmony export */   "ApiFailure": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.ApiFailure),
+/* harmony export */   "ApiResponseBinary": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.ApiResponseBinary),
+/* harmony export */   "ApiResponseDownload": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.ApiResponseDownload),
+/* harmony export */   "ApiResponseUtf8": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.ApiResponseUtf8),
+/* harmony export */   "ApiSuccess": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.ApiSuccess),
+/* harmony export */   "failure": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.failure),
+/* harmony export */   "success": () => (/* reexport safe */ _libResponse__WEBPACK_IMPORTED_MODULE_2__.success)
+/* harmony export */ });
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! source-map-support/register */ "../../source-map-support/register.js");
+/* harmony import */ var source_map_support_register__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(source_map_support_register__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _libDynamo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./libDynamo */ "../../../src/libs/libDynamo.js");
+/* harmony import */ var _libResponse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./libResponse */ "../../../src/libs/libResponse.js");
+
+
+ // export * from "./sessionUtil";
+// export * from "./libArray";
 
 /***/ }),
 
@@ -1313,6 +1645,12 @@ const S3SignDownload = async (s3, Bucket, Key) => {
 };
 const S3SignUpload = async (s3, Bucket, key, Fields = {}, Expires = 3600, minSize = 0, maxSize = Infinity) => {
   const exists = await S3BucketExist(s3, Bucket);
+  console.log({
+    s3
+  });
+  console.log({
+    Bucket
+  });
 
   if (!exists) {
     let thisConfig = {
@@ -1555,8 +1893,8 @@ const sendSMS = async params => {
 const sendTestSMS = async () => {
   try {
     let params = {
-      Message: "Ceci est un message test envoye à partir de lambda",
-      PhoneNumber: "Phone number",
+      Message: "Ceci est un message test envoye de l'equipe Keneya envoye a partir du code",
+      PhoneNumber: "+22671161976",
       Subject: "Test from Keneya",
       MessageAttributes: {
         'AWS.SNS.SMS.SMSType': {
@@ -5876,6 +6214,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _libs_libEmail__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./libs/libEmail */ "../../../src/libs/libEmail.js");
 /* harmony import */ var _libs_libSMS__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./libs/libSMS */ "../../../src/libs/libSMS.js");
 /* harmony import */ var _libs_libResponse__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./libs/libResponse */ "../../../src/libs/libResponse.js");
+/* harmony import */ var _apis_appEnv__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./apis/appEnv */ "../../../src/apis/appEnv.js");
+/* harmony import */ var _apis_apiCommon__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./apis/apiCommon */ "../../../src/apis/apiCommon.js");
+/* harmony import */ var _libs_libFormat__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./libs/libFormat */ "../../../src/libs/libFormat.js");
+/* harmony import */ var _libs_libType__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./libs/libType */ "../../../src/libs/libType.js");
+/* harmony import */ var _apis_apiGet__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./apis/apiGet */ "../../../src/apis/apiGet.js");
+/* harmony import */ var _apis_apiUpdate__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./apis/apiUpdate */ "../../../src/apis/apiUpdate.js");
+
+
+
+
+
+
 
 
 
@@ -5885,26 +6235,47 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const main = async (event, context) => {
-  console.log("IN MAIN FUNCTION");
-  const act = '' + (event && event.act);
-  console.log({
-    act
-  }); // if(act === 'warmStart')
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      "test": "POST"
-    })
+  console.log("IN MAIN FUNCTION:", process.env.cfg);
+  const B = event.body;
+  const E = event.isBase64Encoded;
+  const body = B ? (0,_libs_libType__WEBPACK_IMPORTED_MODULE_11__.tryParseJson)(E ? Buffer.from(B, 'base64').toString('utf8') : B) || {} : {};
+  const qs = event.queryStringParameters || {};
+  await (0,_libs_libFormat__WEBPACK_IMPORTED_MODULE_10__.debugLog)({
+    qs
+  });
+  const request = { ...qs,
+    ...body,
+    act: event.pathParameters.proxy
   };
-  let item = {
-    title: "Test"
-  };
-  const ddb = _aws_cfg__WEBPACK_IMPORTED_MODULE_3__.newDynamo(); // await sendEmailTest();
-  // await sendTestSMS();
+  return await mainWithSession(event, context, request);
+};
 
-  (0,_ddb_cardDDBItem__WEBPACK_IMPORTED_MODULE_4__.addItem)(ddb, item);
-  return _libs_libResponse__WEBPACK_IMPORTED_MODULE_7__.ApiSuccess(event, item);
+const mainWithSession = async (event, context, request) => {
+  //const body = event.body?JSON.parse(event.body):{};
+  //const qs = event.queryStringParameters||{};
+  //const request = {...qs, ...body};
+  // console.log({request});
+  console.log("mainWithSession");
+  const noServe = (0,_libs_libType__WEBPACK_IMPORTED_MODULE_11__.toStrTrimLower)(await (0,_apis_appEnv__WEBPACK_IMPORTED_MODULE_8__.getEnv)('admin_maintenanceMode')) === 'true';
+
+  if (noServe) {
+    console.log('todo should not serve user APIs (forceLogout and return errMainMode');
+  }
+
+  ;
+  const act = (0,_libs_libType__WEBPACK_IMPORTED_MODULE_11__.toStr)(request.act);
+  const ddb = _aws_cfg__WEBPACK_IMPORTED_MODULE_3__.newDynamo();
+  const apiMap = apiMapSignedIn;
+  const fun = act && apiMap[act]; // console.log({act, apiMap, fun});
+
+  if (fun) return await fun(event, context, request, ddb);
+};
+
+const apiMapSignedIn = {
+  'test': _apis_apiGet__WEBPACK_IMPORTED_MODULE_12__.apiTest,
+  'test2': _apis_apiGet__WEBPACK_IMPORTED_MODULE_12__.apiTest2,
+  'patient/add': _apis_apiUpdate__WEBPACK_IMPORTED_MODULE_13__.apiUpdateUserPatient,
+  'patients/all': _apis_apiGet__WEBPACK_IMPORTED_MODULE_12__.apiGetAllPatients
 };
 })();
 

@@ -22,6 +22,7 @@ const ssmCheckExpire = () => {
 };
 
 export const getEnv = async (name,  _stage = '') => {
+  console.log({_stage});
   ssmCheckExpire();
   await getEnvs([name], _stage);
   return __envCache[name];
@@ -36,6 +37,7 @@ export const getEnvs = async (envNames = [], _stage = '') => {
 
   // load cache missing 
   const stage = (_stage || process.env.cfg);
+  console.log({envNames});
   const cacheKeys = Object.keys(__envCache);
   if(stage !== 'offline'){
     const gets = [];

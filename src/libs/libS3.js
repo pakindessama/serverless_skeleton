@@ -100,6 +100,8 @@ export const S3SignUpload = async (s3, Bucket, key,
   Fields = {}, Expires = 3600, minSize = 0, maxSize = Infinity) => {
 
   const exists = await S3BucketExist(s3, Bucket);
+  console.log({s3});
+  console.log({Bucket});
   if(!exists){
     let thisConfig = {
       AllowedHeaders:["*"],

@@ -32,6 +32,7 @@ plugins:
   - serverless-dynamodb-local
   #https://serverless-stack.com/chapters/add-support-for-es6-and-typescript.html to support es6 format
   - serverless-bundle
+  - serverless-dotenv-plugin
   
 provider:
   name: aws
@@ -44,6 +45,7 @@ provider:
     dynamoRegion: ${file(./stages/config.${self:provider.stage}.json):dynamoRegion}
     dynamoHost: ${file(./stages/config.${self:provider.stage}.json):dynamoHost}
     dataTableName: ${self:custom.dataTableName}
+    mediaBucket: ${self:custom.mediaBucket}
 
 
   #iam permissons
