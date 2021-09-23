@@ -9,7 +9,7 @@ custom:
 
   dynamodb:
     start:
-      port: 8000
+      port: 8000 
       inMemory: false
       migrate: true
       dbPath: ./.dynamodb/

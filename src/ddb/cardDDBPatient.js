@@ -28,9 +28,9 @@ export const addPatient = async (ddb, r, table) => {
     return DDB.putItem(ddb, table||dataTable, patient);
 };
 
-export const deletepatient = async (ddb, r, table) => {
-    let patient = {};
-    patient.psk = r.title;
-    patient.ppk = CodePatient;
-    await DDB.deletepatient(ddb, table||dataTable, patient);
+export const deletePatient = async (ddb, r, table) => {
+    let item = {};
+    item.psk = r.psk;
+    item.ppk = r.ppk;
+    await DDB.deletepatient(ddb, table||dataTable, item);
 };

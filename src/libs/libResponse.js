@@ -11,7 +11,7 @@ export const ApiResponseDownload = (event, body='', code=200, fileName,
     { response: buildResponse(event, code, body, isBase64, mimeType, fileName) }
 );
 export const ApiSuccess = (event, body, code=200) => (
-    { event, body, code, success:1 } /* default mimetype json */
+    { event, body:body, code, success:1 } /* default mimetype json */
 );
 export const ApiFailure = (event, body, code=500) => (
     { event, body, code, success:0 } /* default mimetype json */

@@ -9,15 +9,17 @@ import { getEnv } from './apis/appEnv';
 import { apiUploadMedia } from './apis/apiCommon';
 import { debugLog } from './libs/libFormat';
 import { toStrTrimLower, toStr, tryParseJson } from './libs/libType';
-import { apiGetAllPatients, apiTest, apiTest2 } from './apis/apiGet';
+import { apiGetAllPatients, apiGetCountries, apiGetVaccinesByCountry, apiTest, apiTest2 } from './apis/apiGet';
 import { apiUpdateUserPatient } from './apis/apiUpdate';
+import { apiUpload, apiUploadVaccine } from './apis/apiUpload';
 
 export const main = async (event, context) => {
     console.log("IN MAIN FUNCTION:", process.env.cfg);
-
     const B = event.body;
     const E = event.isBase64Encoded;
+    console.log({E});
     const body = B? (tryParseJson(E?Buffer.from(B, 'base64').toString('utf8'):B)||{}): {};
+    // console.log({body});
     const qs = event.queryStringParameters||{};
     await debugLog({qs});
     const request = {...qs, ...body, act:event.pathParameters.proxy};
@@ -49,4 +51,7 @@ const apiMapSignedIn = {
   'test2': apiTest2,
   'patient/add': apiUpdateUserPatient,
   'patients/all': apiGetAllPatients,
+  'apiUpload': apiUpload,
+  'apiGetVaccinesByCountry': apiGetVaccinesByCountry,
+  'apiGetCountries': apiGetCountries
 };

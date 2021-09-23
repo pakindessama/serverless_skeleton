@@ -1,8 +1,5 @@
-
 node_modules
+package-lock.json
 .webpack
 .dynamodb
 .serverless
-.package-lock.json
-.vscode
-.webpack
